@@ -1,0 +1,26 @@
+syntax = "proto3";
+package examples;
+option go_package = "../greeter";
+
+// import "google/api/annotations.proto";
+
+service Greeter {
+	// @GET
+	rpc Hello(Request) returns (Response) {
+
+	}
+	// @POST
+	rpc Stream(stream Request) returns (stream Response) {
+		// option (google.api.http) = { get: "/stream"; };
+	}
+}
+
+message Request {
+	string name = 1;
+	optional string msg = 2;
+}
+
+// 测试
+message Response {
+	string msg = 1;
+}
