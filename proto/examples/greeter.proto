@@ -1,0 +1,11 @@
+syntax = "proto3";
+package examples;
+option go_package = "../../pkg/golang/greeter";
+
+
+message  Request {
+}
+
+message Response {
+
+}

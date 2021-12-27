@@ -923,8 +923,8 @@ func generateFileContent(gen *protogen.Plugin, file *protogen.File, g *protogen.
 	// 自动生成注册gin的何种方法
 	for _, service := range file.Services {
 		g.P("// generated http method")
-		g.P("func register", service.GoName, "HttpHandler(srv service.Service, srvs ", service.GoName, "HttpHandler) {")
-		g.P(`   group := srv.Router("`, strings.ToLower(service.GoName), `")`)
+		g.P("func register", service.GoName, "HttpHandler(srv service.Service, srvs ", service.GoName, "HttpHandler, middleware ...gin.HandlerFunc) {")
+		g.P(`   group := srv.Router("`, strings.ToLower(service.GoName), `", middleware...)`)
 
 		for _, value := range service.Methods {
 			// g.Annotate(value.GoName, value.Location)
@@ -944,9 +944,9 @@ func generateFileContent(gen *protogen.Plugin, file *protogen.File, g *protogen.
 	for _, service := range file.Services {
 		g.P("var T", service.GoName, " ", service.GoName)
 		g.P()
-		g.P("func Register", service.GoName, "HttpHandler(srv service.Service,", "srvs ", service.GoName, ") {")
+		g.P("func Register", service.GoName, "HttpHandler(srv service.Service,", "srvs ", service.GoName, ", middleware ...gin.HandlerFunc) {")
 		g.P("  tmp := new(", "xxx_", service.GoName, ")")
-		g.P("  register", service.GoName, "HttpHandler(srv, tmp)")
+		g.P("  register", service.GoName, "HttpHandler(srv, tmp, middleware...)")
 		g.P("  T", service.GoName, "=srvs")
 		g.P("}")
 		g.P()

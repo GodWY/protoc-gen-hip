@@ -1,0 +1,21 @@
+syntax = "proto3";
+package examples1;
+option go_package = "proto/greeter1";
+
+message  Request {
+}
+
+message Response {
+
+}
+service Greeter {
+	// @GET
+	rpc Hello(Request) returns (Response) {
+
+	}
+	// @POST
+	rpc Stream(stream Request) returns (stream Response) {
+		
+	}
+}
+
