@@ -922,19 +922,24 @@ func generateFileContent(gen *protogen.Plugin, file *protogen.File, g *protogen.
 
 	// 自动生成注册gin的何种方法
 	for _, service := range file.Services {
+		// 服务的注释
+		serviceComments := string(service.Comments.Leading)
+		// 获取服务组的middleWare
+		commentsArr := strings.Split(serviceComments, "@")
+		middleWares := parserComment(commentsArr)
 		g.P("// generated http method")
-		g.P("func register", service.GoName, "HttpHandler(srv service.Service, srvs ", service.GoName, "HttpHandler, middleware ...gin.HandlerFunc) {")
-		g.P(`   group := srv.Router("`, strings.ToLower(service.GoName), `", middleware...)`)
-
+		g.P("func register", service.GoName, "HttpHandler(srv service.Service, srvs ", service.GoName, "HttpHandler) {")
+		g.P(`   group := srv.Router("`, strings.ToLower(service.GoName), `" `, middleWares, ")")
 		for _, value := range service.Methods {
 			// g.Annotate(value.GoName, value.Location)
 			// 读取注释
 			// leadingComments := appendDeprecationSuffix("",
 			// 	value.Desc.Options().(*descriptorpb.MethodOptions).GetDeprecated())
 			a := string(value.Comments.Leading)
-			method := strings.Split(a, "@")[1]
-			method = strings.Trim(method, "\r\n")
-			g.P("group.", method, `("/api/v1/`, strings.ToLower(value.GoName), `", srvs.`, value.GoName, ")")
+			method := strings.Split(a, "@")
+			valuemiddleWares := parserComment(method[2:])
+			methods := strings.Trim(method[1], "\r\n")
+			g.P("group.", methods, `("/api/v1/`, strings.ToLower(value.GoName), `", srvs.`, value.GoName, ", "+valuemiddleWares, ")")
 		}
 		g.P("}")
 		g.P()
@@ -944,9 +949,9 @@ func generateFileContent(gen *protogen.Plugin, file *protogen.File, g *protogen.
 	for _, service := range file.Services {
 		g.P("var T", service.GoName, " ", service.GoName)
 		g.P()
-		g.P("func Register", service.GoName, "HttpHandler(srv service.Service,", "srvs ", service.GoName, ", middleware ...gin.HandlerFunc) {")
+		g.P("func Register", service.GoName, "HttpHandler(srv service.Service,", "srvs ", service.GoName, ") {")
 		g.P("  tmp := new(", "xxx_", service.GoName, ")")
-		g.P("  register", service.GoName, "HttpHandler(srv, tmp, middleware...)")
+		g.P("  register", service.GoName, "HttpHandler(srv, tmp)")
 		g.P("  T", service.GoName, "=srvs")
 		g.P("}")
 		g.P()
@@ -1233,3 +1238,21 @@ func isASCIIDigit(c byte) bool {
 }
 
 const deprecationComment = "// Deprecated: Do not use."
+
+// parserComment 转化注释为字符串
+func parserComment(comment []string) string {
+	var middleware string
+	for _, c := range comment {
+		if len(c) == 0 {
+			continue
+		}
+		c = strings.TrimSpace(c)
+		c = strings.TrimLeft(c, "\r\n")
+		c = strings.TrimRight(c, "\r\n")
+		middleware += c + ","
+	}
+	if len(middleware) == 1 {
+		return ""
+	}
+	return middleware
+}

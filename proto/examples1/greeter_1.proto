@@ -8,8 +8,10 @@ message  Request {
 message Response {
 
 }
+
+
 service Greeter {
-	// @GET
+	// @GET@gin.Logger()
 	rpc Hello(Request) returns (Response) {
 
 	}

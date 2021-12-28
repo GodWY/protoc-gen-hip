@@ -13,17 +13,17 @@ import (
 )
 
 // generated http method
-func registerGreeterHttpHandler(srv service.Service, srvs GreeterHttpHandler, middleware ...gin.HandlerFunc) {
-	group := srv.Router("greeter", middleware...)
-	group.GET("/api/v1/hello", srvs.Hello)
+func registerGreeterHttpHandler(srv service.Service, srvs GreeterHttpHandler) {
+	group := srv.Router("greeter")
+	group.GET("/api/v1/hello", srvs.Hello, gin.Logger())
 	group.POST("/api/v1/stream", srvs.Stream)
 }
 
 var TGreeter Greeter
 
-func RegisterGreeterHttpHandler(srv service.Service, srvs Greeter, middleware ...gin.HandlerFunc) {
+func RegisterGreeterHttpHandler(srv service.Service, srvs Greeter) {
 	tmp := new(xxx_Greeter)
-	registerGreeterHttpHandler(srv, tmp, middleware...)
+	registerGreeterHttpHandler(srv, tmp)
 	TGreeter = srvs
 }
 
