@@ -3,6 +3,10 @@
 
 package greeter1
 
+import (
+	greeter "proto/examples/greeter"
+)
+
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the kratos package it is being compiled against.
 import (
@@ -15,8 +19,10 @@ import (
 
 // generated mqant method
 type Greeter interface {
-	Hello(in *Request) (out *Response)
-	Stream(in *Request) (out *Response)
+	//  @GET@gin.Logger()
+	Hello(in *greeter.Request) (out *Response)
+	//  @POST
+	Stream(in *greeter.Request) (out *Response)
 }
 
 func RegisterGreeterTcpHandler(m *basemodule.BaseModule, ser Greeter) {
@@ -39,7 +45,7 @@ func NewLoginClient(cli client.App, name string) *ClientProxyService {
 
 var ClientProxyIsNil = errors.New("proxy is nil")
 
-func (proxy *ClientProxyService) Hello(req *Request) (rsp *Response, err error) {
+func (proxy *ClientProxyService) Hello(req *greeter.Request) (rsp *Response, err error) {
 	if proxy == nil {
 		return nil, ClientProxyIsNil
 	}
@@ -49,7 +55,7 @@ func (proxy *ClientProxyService) Hello(req *Request) (rsp *Response, err error) 
 	})
 	return rsp, err
 }
-func (proxy *ClientProxyService) Stream(req *Request) (rsp *Response, err error) {
+func (proxy *ClientProxyService) Stream(req *greeter.Request) (rsp *Response, err error) {
 	if proxy == nil {
 		return nil, ClientProxyIsNil
 	}

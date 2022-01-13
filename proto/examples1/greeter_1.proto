@@ -1,9 +1,8 @@
 syntax = "proto3";
 package examples1;
 option go_package = "proto/greeter1";
+import "proto/examples/greeter.proto";
 
-message  Request {
-}
 
 message Response {
 
@@ -12,12 +11,9 @@ message Response {
 
 service Greeter {
 	// @GET@gin.Logger()
-	rpc Hello(Request) returns (Response) {
-
-	}
+	rpc Hello(examples.Request) returns (Response) {}
 	// @POST
-	rpc Stream(stream Request) returns (stream Response) {
-		
+	rpc Stream(examples.Request) returns ( Response) {
 	}
 }
 
