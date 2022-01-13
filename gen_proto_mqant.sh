@@ -1,0 +1,1 @@
+protoc --plugin=protoc-gen-mqant=protoc-gen-mqant --plugin=protoc-gen-go=/Users/wangxinyu/go/bin/protoc-gen-go --proto_path=proto/examples1 --mqant_out=./ --go_out=./  greeter_1.proto --experimental_allow_proto3_optional
