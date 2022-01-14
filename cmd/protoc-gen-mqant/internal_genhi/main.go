@@ -936,7 +936,7 @@ func generateFileContent(gen *protogen.Plugin, file *protogen.File, g *protogen.
 			if a != "" {
 				g.P("// ", a)
 			}
-			g.P(value.GoName, "(in ", "*", value.Input.GoIdent, ")", "(out *", value.Output.GoIdent, ")")
+			g.P(value.GoName, "(in ", "*", value.Input.GoIdent, ")", "(out *", value.Output.GoIdent, ", err error", ")")
 		}
 		g.P("}")
 		g.P()

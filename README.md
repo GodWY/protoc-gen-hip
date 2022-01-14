@@ -1,7 +1,13 @@
-# protoc-gen-hip
-自动生成基于gin的代码封装，使用proto作为信息和http handler的信息封装
+# 自动生成代码介绍
 
-- 缺陷
-1. 暂时无法导入包 需要将请求和rpc放到一个文件里
+## 自动生成基于mqant框架的rpc代码工具
+> 基于grpc自动创建 创建rpc通信服务。
 
-v.1.0.1 支持注册组middleware
+## 使用方式
+1. go build -o "protoc-gen-mqant" cmd/protoc-gen-mqant/main.go
+
+## 实例
+proto/examples/
+
+
+

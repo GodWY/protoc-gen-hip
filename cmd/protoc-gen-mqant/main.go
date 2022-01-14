@@ -43,7 +43,7 @@ func main() {
 		ParamFunc: flags.Set,
 	}.Run(func(gen *protogen.Plugin) error {
 		if *plugins != "" {
-			return errors.New("protoc-gen-go: plugins are not supported; use 'protoc --go-grpc_out=...' to generate gRPC\n\n" +
+			return errors.New("protoc-gen-mqant: plugins are not supported; use 'protoc --go-grpc_out=...' to generate gRPC\n\n" +
 				"See " + grpcDocURL + " for more information.")
 		}
 		for _, f := range gen.Files {

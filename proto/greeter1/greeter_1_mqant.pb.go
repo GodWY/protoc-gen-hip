@@ -20,9 +20,9 @@ import (
 // generated mqant method
 type Greeter interface {
 	//  @GET@gin.Logger()
-	Hello(in *greeter.Request) (out *Response)
+	Hello(in *greeter.Request) (out *Response, err error)
 	//  @POST
-	Stream(in *greeter.Request) (out *Response)
+	Stream(in *greeter.Request) (out *Response, err error)
 }
 
 func RegisterGreeterTcpHandler(m *basemodule.BaseModule, ser Greeter) {
