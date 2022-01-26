@@ -965,17 +965,17 @@ func generateFileContent(gen *protogen.Plugin, file *protogen.File, g *protogen.
 	g.P("}")
 
 	g.P()
-	// 定义实际执行类
-	g.P("func NewLoginClient(cli client.App, name string) *ClientProxyService {")
-	g.P("return &ClientProxyService{")
-	g.P("cli: cli,")
-	g.P("name: name,")
-	g.P("}")
-	g.P("}")
 
 	g.P(`var ClientProxyIsNil = errors.New("proxy is nil")`)
 
 	for _, service := range file.Services {
+		// 定义实际执行类
+		g.P("func New", service.GoName, "Client(cli client.App, name string) *ClientProxyService {")
+		g.P("return &ClientProxyService{")
+		g.P("cli: cli,")
+		g.P("name: name,")
+		g.P("}")
+		g.P("}")
 		for _, method := range service.Methods {
 			g.P("func (proxy *ClientProxyService)", method.GoName, "(req *", method.Input.GoIdent, ")", "(rsp *", method.Output.GoIdent, ", err", " error){")
 			g.P("if proxy == nil {")
