@@ -1,4 +1,4 @@
-module github.com/GodWY/cmd/protoc-gen-hip
+module github.com/GodWY/protoc-gen-hip
 
 go 1.13
 

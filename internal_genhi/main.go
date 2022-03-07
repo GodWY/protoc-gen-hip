@@ -17,8 +17,8 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"github.com/GodWY/cmd/protoc-gen-hip/internal/genid"
-	"github.com/GodWY/cmd/protoc-gen-hip/internal/version"
+	"github.com/GodWY/protoc-gen-hip/internal/genid"
+	"github.com/GodWY/protoc-gen-hip/internal/version"
 	"google.golang.org/genproto/googleapis/api/annotations"
 
 	"google.golang.org/protobuf/compiler/protogen"
