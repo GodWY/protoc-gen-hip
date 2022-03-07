@@ -5,6 +5,8 @@ github.com/GodWY/hi-http v1.0.0/go.mod h1:gSrzPi9zIte5bUJvfctMiRCFvkTFIoEZ12eXyY
 github.com/GodWY/hip v1.0.0 h1:ab7yJ4uJDjFjf1/Sa3F3jUeTl0QqFKZakISUAgjHujE=
 github.com/GodWY/hip v1.0.1 h1:NwQwxSfqbpexLIkiKdJ+IJGPce/xq4JTD+RWicf6SXg=
 github.com/GodWY/hip v1.0.1/go.mod h1:+FgaRPcKF/KIypJ9LC8GaPVcXKtwgywfiKRLQiQHGKk=
+github.com/GodWY/protoc-gen-hip v1.0.2 h1:SpqgO1Z3IoFvTXhFS2JZUVtvM4Ai+mrdNIAVbfmbcn0=
+github.com/GodWY/protoc-gen-hip v1.0.2/go.mod h1:ywiWIQzIN2U0aiZJX4l26/r7zWdp6db2z/nyU0rU6Fw=
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
 github.com/StackExchange/wmi v1.2.1/go.mod h1:rcmrprowKIVzvc+NUiLncP2uuArMWLCbu9SBzvHz7e8=
 github.com/antihax/optional v1.0.0/go.mod h1:uupD/76wgC+ih3iEmQUL+0Ugr19nfwCT1kdvxnR2qWY=
