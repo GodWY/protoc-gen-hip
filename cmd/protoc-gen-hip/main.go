@@ -16,8 +16,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/GodWY/cmd/protoc-gen-hip/internal/version"
 	gengo "github.com/GodWY/protoc-gen-hip/cmd/protoc-gen-hip/internal_genhi"
-	"github.com/GodWY/protoc-gen-hip/internal/version"
 	"google.golang.org/protobuf/compiler/protogen"
 )
 
