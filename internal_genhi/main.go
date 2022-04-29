@@ -18,10 +18,8 @@ import (
 
 	"github.com/GodWY/protoc-gen-hip/internal/genid"
 	"github.com/GodWY/protoc-gen-hip/internal/version"
-	"google.golang.org/genproto/googleapis/api/annotations"
 
 	"google.golang.org/protobuf/compiler/protogen"
-	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
 
 	"google.golang.org/protobuf/types/descriptorpb"
@@ -1030,6 +1028,7 @@ func hasPathPrefix(comm string) (method string, middlewares []string) {
 		case "method":
 			// 这是gin的方法, 全部大写
 			method = strings.TrimSpace(strings.ToUpper(tags[1]))
+			method = httpMethod(method)
 		case "middleware":
 			middlewares = append(middlewares, tags[1:]...)
 		}
@@ -1081,20 +1080,20 @@ func genHttpService(gen *protogen.Plugin, file *protogen.File, g *protogen.Gener
 	}
 }
 
-func hasHTTPRule(services []*protogen.Service) bool {
-	for _, service := range services {
-		for _, method := range service.Methods {
-			if method.Desc.IsStreamingClient() || method.Desc.IsStreamingServer() {
-				continue
-			}
-			rule, ok := proto.GetExtension(method.Desc.Options(), annotations.E_Http).(*annotations.HttpRule)
-			if rule != nil && ok {
-				return true
-			}
-		}
-	}
-	return false
-}
+//func hasHTTPRule(services []*protogen.Service) bool {
+//	for _, service := range services {
+//		for _, method := range service.Methods {
+//			if method.Desc.IsStreamingClient() || method.Desc.IsStreamingServer() {
+//				continue
+//			}
+//			rule, ok := proto.GetExtension(method.Desc.Options(), annotations.E_Http).(*annotations.HttpRule)
+//			if rule != nil && ok {
+//				return true
+//			}
+//		}
+//	}
+//	return false
+//}
 
 func buildPathVars(method *protogen.Method, path string) (res []string) {
 	for _, v := range strings.Split(path, "/") {
@@ -1190,4 +1189,15 @@ func parserComment(comment []string) string {
 		return ""
 	}
 	return middleware
+}
+
+func httpMethod(method string) string {
+	newMethod := "GET"
+	switch method {
+	case "GET", "POST":
+		return method
+	case "ANY":
+		return "Any"
+	}
+	return newMethod
 }
