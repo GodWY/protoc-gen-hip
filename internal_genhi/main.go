@@ -917,7 +917,7 @@ func generateFileContent(gen *protogen.Plugin, file *protogen.File, g *protogen.
 	g.P(`"net/http"`)
 	g.P()
 	g.P(`"github.com/gin-gonic/gin"`)
-	g.P(`"github.com/GodWY/hip/service"`)
+	//g.P(`"github.com/GodWY/hip/service"`)
 	g.P(")")
 
 	// 自动生成注册gin的何种方法
@@ -931,7 +931,7 @@ func generateFileContent(gen *protogen.Plugin, file *protogen.File, g *protogen.
 			commentsArr = strings.Split(serviceComments, "@")
 		}
 		g.P("// generated http method")
-		g.P("func register", service.GoName, "HttpHandler(srv service.Service, srvs ", service.GoName, "HttpHandler) {")
+		g.P("func register", service.GoName, "HttpHandler(srv *gin.Engine, srvs ", service.GoName, "HttpHandler) {")
 		if len(commentsArr) > 0 {
 			valuemiddleWares := ""
 			for i := 0; i < len(commentsArr); i++ {
@@ -941,9 +941,9 @@ func generateFileContent(gen *protogen.Plugin, file *protogen.File, g *protogen.
 					valuemiddleWares += ","
 				}
 			}
-			g.P(`   group := srv.Router("`, strings.ToLower(service.GoName), `" `, valuemiddleWares, ")")
+			g.P(`   group := srv.Group("`, strings.ToLower(service.GoName), `" `, valuemiddleWares, ")")
 		} else {
-			g.P(`   group := srv.Router("`, strings.ToLower(service.GoName), `" )`)
+			g.P(`   group := srv.Group("`, strings.ToLower(service.GoName), `" )`)
 		}
 		for _, value := range service.Methods {
 			// g.Annotate(value.GoName, value.Location)
@@ -979,7 +979,7 @@ func generateFileContent(gen *protogen.Plugin, file *protogen.File, g *protogen.
 	for _, service := range file.Services {
 		g.P("var T", service.GoName, " ", service.GoName)
 		g.P()
-		g.P("func Register", service.GoName, "HttpHandler(srv service.Service,", "srvs ", service.GoName, ") {")
+		g.P("func Register", service.GoName, "HttpHandler(srv *gin.Engine,", "srvs ", service.GoName, ") {")
 		g.P("  tmp := new(", "xxx_", service.GoName, ")")
 		g.P("  register", service.GoName, "HttpHandler(srv, tmp)")
 		g.P("  T", service.GoName, "=srvs")

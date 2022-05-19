@@ -58,6 +58,6 @@ const (
 //	v1.20.1
 //	v1.21.0-rc.1
 func String() string {
-	v := "v1.1.2"
+	v := "v1.1.5"
 	return v
 }
