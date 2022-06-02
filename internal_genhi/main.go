@@ -1055,7 +1055,7 @@ func genXService(gen *protogen.Plugin, file *protogen.File, g *protogen.Generate
 		g.P("   }")
 		g.P("   rsp, err := ", "T", service.GoName, ".", value.GoName, "(ctx,req)")
 		g.P("   if err != nil {")
-		g.P("	  ctx.JSON(http.StatusOK, err.Error())")
+		g.P("	  ctx.JSON(http.StatusOK, err)")
 		g.P("     return")
 		g.P("    }")
 		g.P("  ctx.JSON(http.StatusOK, rsp)")
