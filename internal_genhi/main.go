@@ -941,9 +941,9 @@ func generateFileContent(gen *protogen.Plugin, file *protogen.File, g *protogen.
 					valuemiddleWares += ","
 				}
 			}
-			g.P(`   group := srv.Group("`, strings.ToLower(service.GoName), `" `, valuemiddleWares, ")")
+			g.P(`   group := srv.Group("`, "api/"+strings.ToLower(service.GoName), `" `, valuemiddleWares, ")")
 		} else {
-			g.P(`   group := srv.Group("`, strings.ToLower(service.GoName), `" )`)
+			g.P(`   group := srv.Group("`, "api/"+strings.ToLower(service.GoName), `" )`)
 		}
 		for _, value := range service.Methods {
 			// g.Annotate(value.GoName, value.Location)
@@ -970,9 +970,9 @@ func generateFileContent(gen *protogen.Plugin, file *protogen.File, g *protogen.
 					}
 				}
 
-				g.P("group.", methods, `("/api/v1/`, path, `", srvs.`, value.GoName, ", "+valuemiddleWares, ")")
+				g.P("group.", methods, `("/v1/`, path, `", srvs.`, value.GoName, ", "+valuemiddleWares, ")")
 			} else {
-				g.P("group.", methods, `("/api/v1/`, path, `", srvs.`, value.GoName, ")")
+				g.P("group.", methods, `("/v1/`, path, `", srvs.`, value.GoName, ")")
 			}
 
 		}
