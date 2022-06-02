@@ -6,6 +6,13 @@ import (
 	"text/template"
 )
 
+type result struct {
+	Code   string      `json:"code"`
+	Detail string      `json:"detail"`
+	Status int         `json:"status"`
+	Data interface{} `json:"data"`
+}
+
 var httpTemplate = `
 {{$svrType := .ServiceType}}
 {{$svrName := .ServiceName}}
