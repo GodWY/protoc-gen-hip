@@ -955,6 +955,10 @@ func generateFileContent(gen *protogen.Plugin, file *protogen.File, g *protogen.
 			// method := strings.Split(a, "@")
 			// valuemiddleWares := parserComment(method[2:])
 			methods := strings.Trim(method, "\r\n")
+			prefix := value.GoName[0:1]
+			last := value.GoName[1:]
+			x := strings.ToLower(prefix)
+			path := fmt.Sprintf("%v%v", x, last)
 			if len(middleWares) > 0 {
 				// 拼接middle
 				var valuemiddleWares string
@@ -965,9 +969,10 @@ func generateFileContent(gen *protogen.Plugin, file *protogen.File, g *protogen.
 						valuemiddleWares += ","
 					}
 				}
-				g.P("group.", methods, `("/api/v1/`, strings.ToLower(value.GoName), `", srvs.`, value.GoName, ", "+valuemiddleWares, ")")
+
+				g.P("group.", methods, `("/api/v1/`, path, `", srvs.`, value.GoName, ", "+valuemiddleWares, ")")
 			} else {
-				g.P("group.", methods, `("/api/v1/`, strings.ToLower(value.GoName), `", srvs.`, value.GoName, ")")
+				g.P("group.", methods, `("/api/v1/`, path, `", srvs.`, value.GoName, ")")
 			}
 
 		}
