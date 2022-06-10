@@ -930,20 +930,16 @@ func generateFileContent(gen *protogen.Plugin, file *protogen.File, g *protogen.
 			// middleWares = parserComment(serviceComments)
 			commentsArr = strings.Split(serviceComments, "@")
 		}
+		si := parserComment(commentsArr)
+		if si.ProjectUri == "" {
+			si.ProjectUri = "/api"
+		}
 		g.P("// generated http method")
 		g.P("func register", service.GoName, "HttpHandler(srv *gin.Engine, srvs ", service.GoName, "HttpHandler) {")
-		if len(commentsArr) > 0 {
-			valuemiddleWares := ""
-			for i := 0; i < len(commentsArr); i++ {
-				m := strings.Trim(commentsArr[i], "\r\n")
-				valuemiddleWares += m
-				if i < len(commentsArr) && i > 0 {
-					valuemiddleWares += ","
-				}
-			}
-			g.P(`   group := srv.Group("`, "api/"+strings.ToLower(service.GoName), `" `, valuemiddleWares, ")")
+		if len(si.MiddleWire) > 0 {
+			g.P(`   group := srv.Group("`, si.ProjectUri, "/"+strings.ToLower(service.GoName), `" ,`, si.MiddleWire, ")")
 		} else {
-			g.P(`   group := srv.Group("`, "api/"+strings.ToLower(service.GoName), `" )`)
+			g.P(`   group := srv.Group("`, si.ProjectUri, "/"+strings.ToLower(service.GoName), `" )`)
 		}
 		for _, value := range service.Methods {
 			// g.Annotate(value.GoName, value.Location)
@@ -1193,22 +1189,32 @@ func isASCIIDigit(c byte) bool {
 
 const deprecationComment = "// Deprecated: Do not use."
 
+// ServiceInfo 服务的基本信息，包括组路由，中间件
+type ServiceInfo struct {
+	ProjectUri string
+	MiddleWire string
+}
+
 // parserComment 转化注释为字符串
-func parserComment(comment []string) string {
+func parserComment(comment []string) *ServiceInfo {
+	si := &ServiceInfo{}
 	var middleware string
 	for _, c := range comment {
-		if len(c) == 0 {
-			continue
-		}
 		c = strings.TrimSpace(c)
 		c = strings.TrimLeft(c, "\r\n")
 		c = strings.TrimRight(c, "\r\n")
-		middleware += c + ","
+		if strings.HasPrefix(c, "root") {
+			si.ProjectUri = strings.Split(c, ":")[1]
+			continue
+		}
+		if strings.HasPrefix(c, "middle") {
+			middleware = strings.Split(c, ":")[1]
+		}
+
 	}
-	if len(middleware) == 1 {
-		return ""
-	}
-	return middleware
+	si.MiddleWire = middleware
+	return si
+
 }
 
 func httpMethod(method string) string {
