@@ -1,12 +1,3 @@
-// Copyright 2018 The Go Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
-
-// The protoc-gen-go binary is a protoc plugin to generate Go code for
-// both proto2 and proto3 versions of the protocol buffer language.
-//
-// For more information about the usage of this plugin, see:
-//	https://developers.google.com/protocol-buffers/docs/reference/go-generated
 package main
 
 import (
@@ -17,20 +8,17 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/GodWY/protoc-gen-hip/internal/version"
 	"google.golang.org/protobuf/compiler/protogen"
 )
 
-const genGoDocURL = "https://developers.google.com/protocol-buffers/docs/reference/go-generated"
-const grpcDocURL = "https://grpc.io/docs/languages/go/quickstart/#regenerate-grpc-code"
+const Version = "v1.2.0"
 
 func main() {
 	if len(os.Args) == 2 && os.Args[1] == "--version" {
-		fmt.Fprintf(os.Stdout, "%v %v\n", filepath.Base(os.Args[0]), version.String())
+		fmt.Fprintf(os.Stdout, "%v %v\n", filepath.Base(os.Args[0]), Version)
 		os.Exit(0)
 	}
 	if len(os.Args) == 2 && os.Args[1] == "--help" {
-		fmt.Fprintf(os.Stdout, "See "+genGoDocURL+" for usage information.\n")
 		os.Exit(0)
 	}
 
@@ -43,8 +31,7 @@ func main() {
 		ParamFunc: flags.Set,
 	}.Run(func(gen *protogen.Plugin) error {
 		if *plugins != "" {
-			return errors.New("protoc-gen-go: plugins are not supported; use 'protoc --go-grpc_out=...' to generate gRPC\n\n" +
-				"See " + grpcDocURL + " for more information.")
+			return errors.New("protoc-gen-go: plugins are not supported; use 'protoc --go-grpc_out=...' to generate gRPC\n\n")
 		}
 		for _, f := range gen.Files {
 			if f.Generate {
