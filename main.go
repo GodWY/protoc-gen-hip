@@ -5,17 +5,16 @@ import (
 	"flag"
 	"fmt"
 	"github.com/GodWY/protoc-gen-hip/internal_genhi"
+	"github.com/GodWY/protoc-gen-hip/version"
 	"os"
 	"path/filepath"
 
 	"google.golang.org/protobuf/compiler/protogen"
 )
 
-const Version = "v1.2.0"
-
 func main() {
 	if len(os.Args) == 2 && os.Args[1] == "--version" {
-		fmt.Fprintf(os.Stdout, "%v %v\n", filepath.Base(os.Args[0]), Version)
+		fmt.Fprintf(os.Stdout, "%v %v\n", filepath.Base(os.Args[0]), version.String())
 		os.Exit(0)
 	}
 	if len(os.Args) == 2 && os.Args[1] == "--help" {
