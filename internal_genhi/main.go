@@ -229,13 +229,10 @@ func generateFileContent(gen *protogen.Plugin, file *protogen.File, g *protogen.
 				var valuemiddleWares string
 				for i := 0; i < len(middleWares); i++ {
 					m := strings.Trim(middleWares[i], "\r\n")
-					valuemiddleWares += m
-					if i < len(middleWares) && i > 0 {
-						valuemiddleWares += ","
-					}
+					valuemiddleWares = valuemiddleWares + m + ","
 				}
 
-				g.P("group.", methods, `("/v1/`, path, `", srvs.`, value.GoName, ", "+valuemiddleWares, ")")
+				g.P("group.", methods, `("/v1/`, path, `"`, ", "+valuemiddleWares, ` srvs.`, value.GoName, ")")
 			} else {
 				g.P("group.", methods, `("/v1/`, path, `", srvs.`, value.GoName, ")")
 			}
