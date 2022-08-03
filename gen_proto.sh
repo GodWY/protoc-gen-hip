@@ -1,1 +1,0 @@
-protoc --plugin=protoc-gen-hip=protoc-gen-hip --plugin=protoc-gen-go=/Users/wangxinyu/go/bin/protoc-gen-go --proto_path=proto/examples1 --hip_out=./ --go_out=./  greeter_1.proto --experimental_allow_proto3_optional

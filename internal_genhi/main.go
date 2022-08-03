@@ -6,6 +6,8 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
+	"google.golang.org/genproto/googleapis/api/annotations"
+	"google.golang.org/protobuf/proto"
 	"strings"
 	"unicode"
 	"unicode/utf8"
@@ -17,53 +19,11 @@ import (
 	"google.golang.org/protobuf/types/pluginpb"
 )
 
-var (
-	ImportPath = "import"
-)
-
 // SupportedFeatures reports the set of supported protobuf language features.
 var SupportedFeatures = uint64(pluginpb.CodeGeneratorResponse_FEATURE_PROTO3_OPTIONAL)
 
 // GenerateFile generates the contents of a .pb.go file.
 func GenerateFile(gen *protogen.Plugin, file *protogen.File) *protogen.GeneratedFile {
-	// filename := file.GeneratedFilenamePrefix + ".pb.go"
-	// g := gen.NewGeneratedFile(filename, file.GoImportPath)
-	// f := newFileInfo(file)
-
-	// genStandaloneComments(g, f, int32(genid.FileDescriptorProto_Syntax_field_number))
-	// genGeneratedHeader(gen, g, f)
-	// genStandaloneComments(g, f, int32(genid.FileDescriptorProto_Package_field_number))
-
-	// packageDoc := genPackageKnownComment(f)
-	// g.P(packageDoc, "package ", f.GoPackageName)
-	// g.P()
-
-	// // Emit a static check that enforces a minimum version of the proto package.
-	// if GenerateVersionMarkers {
-	// 	g.P("const (")
-	// 	g.P("// Verify that this generated code is sufficiently up-to-date.")
-	// 	g.P("_ = ", protoimplPackage.Ident("EnforceVersion"), "(", protoimpl.GenVersion, " - ", protoimplPackage.Ident("MinVersion"), ")")
-	// 	g.P("// Verify that runtime/protoimpl is sufficiently up-to-date.")
-	// 	g.P("_ = ", protoimplPackage.Ident("EnforceVersion"), "(", protoimplPackage.Ident("MaxVersion"), " - ", protoimpl.GenVersion, ")")
-	// 	g.P(")")
-	// 	g.P()
-	// }
-
-	// for i, imps := 0, f.Desc.Imports(); i < imps.Len(); i++ {
-	// 	genImport(gen, g, f, imps.Get(i))
-	// }
-	// for _, enum := range f.allEnums {
-	// 	genEnum(g, f, enum)
-	// }
-	// for _, message := range f.allMessages {
-	// 	genMessage(g, f, message)
-	// }
-	// genExtensions(g, f)
-
-	// genReflectFileDescriptor(gen, g, f)
-
-	// 生成http代码
-
 	return generateFile(gen, file, false)
 }
 
@@ -149,7 +109,6 @@ func genImport(gen *protogen.Plugin, g *protogen.GeneratedFile, f *fileInfo, imp
 
 // generateFile generates a _http.pb.go file containing kratos errors definitions.
 func generateFile(gen *protogen.Plugin, file *protogen.File, omitempty bool) *protogen.GeneratedFile {
-
 	if len(file.Services) == 0 {
 		return nil
 	}
@@ -164,6 +123,7 @@ func generateFile(gen *protogen.Plugin, file *protogen.File, omitempty bool) *pr
 	g.P()
 	g.P("package ", file.GoPackageName)
 	g.P()
+
 	generateFileContent(gen, file, g, omitempty)
 	return g
 }
@@ -174,7 +134,7 @@ func generateFileContent(gen *protogen.Plugin, file *protogen.File, g *protogen.
 		return
 	}
 	g.P("// This is a compile-time assertion to ensure that this generated file")
-	g.P("// is compatible with the kratos package it is being compiled against.")
+	g.P("// is compatible with the mqant package it is being compiled against.")
 	g.P("import (")
 	g.P(`"net/http"`)
 	g.P(`"github.com/GodWY/gutil"`)
@@ -186,8 +146,6 @@ func generateFileContent(gen *protogen.Plugin, file *protogen.File, g *protogen.
 	g.P(`"github.com/gin-gonic/gin"`)
 	//g.P(`"github.com/GodWY/hip/service"`)
 	g.P(")")
-
-	// 读取注释里的导入的包
 
 	// 自动生成注册gin的何种方法
 	for _, service := range file.Services {
@@ -210,20 +168,29 @@ func generateFileContent(gen *protogen.Plugin, file *protogen.File, g *protogen.
 		} else {
 			g.P(`   group := srv.Group("`, si.ProjectUri, "/"+strings.ToLower(service.GoName), `" )`)
 		}
+		// 获取option 下定义的api参数
+		restfulApis := ReadServiceOptions(g, service)
 		for _, value := range service.Methods {
-			// g.Annotate(value.GoName, value.Location)
-			// 读取注释
-			// leadingComments := appendDeprecationSuffix("",
-			// 	value.Desc.Options().(*descriptorpb.MethodOptions).GetDeprecated())
+			restfulApi := &RestfulAPI{}
+			for _, ra := range restfulApis {
+				if ra.Method == value.GoName {
+					restfulApi = ra
+				}
+			}
 			a := string(value.Comments.Leading)
 			method, middleWares := hasPathPrefix(a)
-			// method := strings.Split(a, "@")
-			// valuemiddleWares := parserComment(method[2:])
-			methods := strings.Trim(method, "\r\n")
+			methods := "/v1/" + strings.Trim(method, "\r\n")
 			prefix := value.GoName[0:1]
 			last := value.GoName[1:]
 			x := strings.ToLower(prefix)
 			path := fmt.Sprintf("%v%v", x, last)
+			if restfulApi.RequestMethod != "" {
+				methods = restfulApi.RequestMethod
+			}
+			if restfulApi.Url != "" {
+				path = restfulApi.Url
+			}
+
 			if len(middleWares) > 0 {
 				// 拼接middle
 				var valuemiddleWares string
@@ -232,9 +199,9 @@ func generateFileContent(gen *protogen.Plugin, file *protogen.File, g *protogen.
 					valuemiddleWares = valuemiddleWares + m + ","
 				}
 
-				g.P("group.", methods, `("/v1/`, path, `"`, ", "+valuemiddleWares, ` srvs.`, value.GoName, ")")
+				g.P("group.", methods, `("`, path, `"`, ", "+valuemiddleWares, ` srvs.`, value.GoName, ")")
 			} else {
-				g.P("group.", methods, `("/v1/`, path, `", srvs.`, value.GoName, ")")
+				g.P("group.", methods, `("`, path, `", srvs.`, value.GoName, ")")
 			}
 
 		}
@@ -308,10 +275,11 @@ func genXService(gen *protogen.Plugin, file *protogen.File, g *protogen.Generate
 		g.P("//")
 		g.P(deprecationComment)
 	}
+
 	for _, value := range service.Methods {
 		g.P("func (xx *xxx_", service.GoName, ")", value.GoName, "(ctx *gin.Context)", "{")
 		g.P("  req := &", value.Input.GoIdent, "{}")
-		g.P("  if ok := ctx.Bind(req); ok != nil {")
+		g.P("  if ok := ctx.ShouldBind(req); ok != nil {")
 		g.P(`detail:= "bind request error"`)
 		g.P("rt:=gutil.RetFail(10000,detail)")
 		g.P(` 	  ctx.JSON(http.StatusOK, rt)`)
@@ -347,6 +315,72 @@ func genHttpService(gen *protogen.Plugin, file *protogen.File, g *protogen.Gener
 	for _, value := range service.Methods {
 
 		g.P(value.GoName, "(ctx ", "*", "gin.Context", ")")
+	}
+}
+
+// RestfulAPI 定义方法
+type RestfulAPI struct {
+	// 请求方法。 目前支持GET，POST，ANY
+	RequestMethod string
+	// 自定义的路径
+	Url string
+	// api方法
+	Method       string
+	body         string
+	responseBody string
+}
+
+// ReadServiceOptions 读取服务的option
+func ReadServiceOptions(g *protogen.GeneratedFile, service *protogen.Service) []*RestfulAPI {
+	//ra := &RestfulAPI{}
+	rp := make([]*RestfulAPI, 0, len(service.Methods))
+	for _, method := range service.Methods {
+		rule, ok := proto.GetExtension(method.Desc.Options(), annotations.E_Http).(*annotations.HttpRule)
+		if rule != nil && ok {
+			for _, bind := range rule.AdditionalBindings {
+				rp = append(rp, buildHTTPRule(g, method, bind))
+			}
+			rp = append(rp, buildHTTPRule(g, method, rule))
+		}
+	}
+	return rp
+}
+func buildHTTPRule(g *protogen.GeneratedFile, m *protogen.Method, rule *annotations.HttpRule) *RestfulAPI {
+	var (
+		path         string
+		method       string
+		body         string
+		responseBody string
+	)
+	switch pattern := rule.Pattern.(type) {
+	case *annotations.HttpRule_Get:
+		path = pattern.Get
+		method = "GET"
+	case *annotations.HttpRule_Put:
+		path = pattern.Put
+		method = "PUT"
+	case *annotations.HttpRule_Post:
+		path = pattern.Post
+		method = "POST"
+	case *annotations.HttpRule_Delete:
+		path = pattern.Delete
+		method = "DELETE"
+	case *annotations.HttpRule_Patch:
+		path = pattern.Patch
+		method = "PATCH"
+	case *annotations.HttpRule_Custom:
+		path = pattern.Custom.Path
+		method = pattern.Custom.Kind
+	}
+	body = rule.Body
+	responseBody = rule.ResponseBody
+
+	return &RestfulAPI{
+		RequestMethod: method,
+		Url:           path,
+		Method:        m.GoName,
+		body:          body,
+		responseBody:  responseBody,
 	}
 }
 
