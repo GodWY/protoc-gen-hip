@@ -1,17 +1,18 @@
 syntax="proto3";
 package greeter;
 option go_package="examples/gen";
-import "examples/google/api/annotations.proto";
+// test
 message Request{
 
 }
 message Response{}
 
 
+// @root:api/xxx  @middle:gin.Logger() @middle:gin.Recovery()
+// @doc:this is a test
 service Login{
-  rpc GetUserName(Request)returns(Response){
-    option (google.api.http) = {
-      get: "/helloworld/:id",
-    };
-  };
+  //@method:GET
+  rpc GetUserName(Request)returns(Response){};
+  //@method:POST @middle:gin.Logger() @middle:gin.Recovery()
+  rpc GetUserID(Request)returns(Response){};
 }

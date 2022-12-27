@@ -24,7 +24,7 @@ var SupportedFeatures = uint64(pluginpb.CodeGeneratorResponse_FEATURE_PROTO3_OPT
 
 // GenerateFile generates the contents of a .pb.go file.
 func GenerateFile(gen *protogen.Plugin, file *protogen.File) *protogen.GeneratedFile {
-	return generateFile(gen, file, false)
+	return genWithTemplate(gen, file, false)
 }
 
 func genImport(gen *protogen.Plugin, g *protogen.GeneratedFile, f *fileInfo, imp protoreflect.FileImport) {
@@ -454,6 +454,7 @@ func httpMethod(method string) string {
 		return method
 	case "ANY":
 		return "Any"
+	default:
+		return newMethod
 	}
-	return newMethod
 }
