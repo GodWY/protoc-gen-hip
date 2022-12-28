@@ -58,21 +58,28 @@ func buildTemplate(gen *protogen.Plugin, file *protogen.File, g *protogen.Genera
 		for _, m := range service.Methods {
 			mInfo := &MethodInfo{}
 			mInfo.SpiltMethodComments(m.Comments.Leading.String())
-
+			// 拼接middle
+			var funcName string
+			if len(mInfo.Middles) > 0 {
+				funcName += mInfo.Middles[0] + ","
+			}
+			funcName += "h." + m.GoName
+			if len(mInfo.after) > 0 {
+				funcName += "," + mInfo.after[0]
+			}
 			prefix := m.GoName[0:1]
 			x := strings.ToLower(prefix)
 			path := fmt.Sprintf("/%v%v", x, m.GoName[1:])
 			rout := &template_hip.Routers{
-				Path:     path,
-				FuncName: m.GoName,
-				In:       m.Input.GoIdent.GoName,
-				Out:      m.Output.GoIdent.GoName,
-				Method:   mInfo.Method,
-				Leading:  mInfo.Docs,
+				Path:       path,
+				FuncName:   m.GoName,
+				In:         m.Input.GoIdent.GoName,
+				Out:        m.Output.GoIdent.GoName,
+				Method:     mInfo.Method,
+				Leading:    mInfo.Docs,
+				MiddleWare: funcName,
 			}
-			if len(mInfo.Middles) > 0 {
-				rout.MiddleWare = mInfo.Middles[0]
-			}
+
 			routs = append(routs, rout)
 		}
 		sg.Routers = routs
@@ -160,11 +167,17 @@ func (m *MethodInfo) SpiltMethodComments(leading string) []string {
 		if strings.HasPrefix(c, "doc") {
 			m.Docs = strings.Split(c, ":")[1]
 		}
+		if strings.HasPrefix(c, "after") {
+			m.after = append(m.after, strings.Split(c, ":")[1])
+		}
 		m.Meta = meta
 	}
 	if len(m.Middles) > 0 {
 		finalMiddle := strings.Join(m.Middles, ",")
 		m.Middles = []string{finalMiddle}
+	}
+	if len(m.after) > 0 {
+		m.after = []string{strings.Join(m.after, ",")}
 	}
 	return nil
 }
@@ -180,6 +193,7 @@ type MethodInfo struct {
 	Imports []string
 	Method  string
 	Docs    string
+	after   []string
 }
 type ServerInfo struct {
 	// Meta 元数据
@@ -191,6 +205,7 @@ type ServerInfo struct {
 	Middles []string
 	Imports []string
 	Docs    string
+	after   []string
 }
 
 type Meta struct {

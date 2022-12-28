@@ -13,6 +13,6 @@ message Response{}
 service Login{
   //@method:GET
   rpc GetUserName(Request)returns(Response){};
-  //@method:POST @middle:gin.Logger() @middle:gin.Recovery()
+  //@method:POST @middle:gin.Logger() @middle:gin.Recovery() @after:gin.Recovery()
   rpc GetUserID(Request)returns(Response){};
 }

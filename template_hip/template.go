@@ -23,18 +23,14 @@ import (
 {{ range $v := .ServiceGroup}}
 // generated http method
 func register{{$v.ServiceName}}HttpHandler(srv *gin.Engine, h {{$v.ServiceName}}HttpHandler) {
-	{{- if $v.MiddleWare -}}
+	{{- if $v.MiddleWare }}
 		group := srv.Group("{{$v.GroupPath}}",{{$v.MiddleWare}})
 	{{- else -}}
 		group := srv.Group("{{$v.GroupPath}}")
 	{{- end -}}
 	
 	{{range $x:= $v.Routers}}
-		{{- if $x.MiddleWare }}
-			group.{{$x.Method}}("{{$x.Path}}", h.{{$x.FuncName}}, {{$x.MiddleWare}})
-		{{else}}
-			group.{{$x.Method}}("{{$x.Path}}", h.{{$x.FuncName}})
-		{{- end -}}
+		group.{{$x.Method}}("{{$x.Path}}", {{$x.MiddleWare}})
 	{{- end -}}
 }
 
